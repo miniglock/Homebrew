@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import Firebase from "../Firebase/firebase";
 import { PasswordForgetLink } from "../PasswordForget";
-import { Wrapper, Form } from "./style";
+import { MyWrapper, MyForm } from "./style";
 
 class Login extends Component {
   state = {
@@ -23,6 +23,7 @@ class Login extends Component {
       await Firebase.doSignInUserWithEmailAndPassword(email, password);
       this.props.doSetCurrentUser({ email });
       this.setState({ isAuth: true });
+      console.log("hit");
     } catch (error) {
       this.setState({
         error
@@ -40,9 +41,9 @@ class Login extends Component {
       return <Redirect to="/" />;
     }
     return (
-      <Wrapper color="pink">
+      <MyWrapper color="pink">
         <h1> Login</h1>
-        <Form onSubmit={this.handleFormSubmit}>
+        <MyForm onSubmit={this.handleMySubmit}>
           <input
             placeholder="Email"
             type="text"
@@ -58,9 +59,9 @@ class Login extends Component {
           <button disabled={isInvalid} type="submit">
             Submit
           </button>
-        </Form>
+        </MyForm>
         <PasswordForgetLink />
-      </Wrapper>
+      </MyWrapper>
     );
   }
 }

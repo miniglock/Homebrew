@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Firebase from "../../components/Firebase/firebase.js";
 
 const Profile = () => {
-  const addRace = async () => {
+  const addRace = async race => {
     const raceRef = await Firebase.database
       .collection("races")
       .where("name", "==", "gnome");

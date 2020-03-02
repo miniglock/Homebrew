@@ -5,6 +5,11 @@ import { Switch, Route } from "react-router-dom";
 import Profile from "./components/Profile";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import CreateModule from "./components/Create/module.jsx";
+import CreateRace from "./components/Create/race.jsx";
+import CreateClass from "./components/Create/class.jsx";
+import Modules from "./components/Modules";
+import Firebase from "./components/Firebase/firebase.js";
 
 class App extends Component {
   state = {
@@ -18,6 +23,24 @@ class App extends Component {
       isLoggedIn: currentUser ? true : false
     });
   };
+
+  componentDidMount = async () => {
+    await Firebase.auth.onAuthStateChanged(async authUser => {
+      if (authUser) {
+        console.log("logged in: ", authUser);
+        const user = await Firebase.database
+          .collection("users")
+          .get(authUser.id);
+        this.setState({
+          currentUser: user.docs[0].data(),
+          isLoggedIn: true
+        });
+      } else {
+        console.log("logged out ");
+      }
+    });
+  };
+
   render() {
     const { isLoggedIn, currentUser } = this.state;
     return (
@@ -27,7 +50,8 @@ class App extends Component {
           currentUser={currentUser}
           doSetCurrentUser={this.doSetCurrentUser}
         />
-
+        <h1>Welcome to HomeBrew</h1>
+        <h2>Your one stop shop for D&D 5E Homebrewed content</h2>
         <Switch>
           <Route exact path="/profile" component={Profile} />
           <Route
@@ -40,6 +64,10 @@ class App extends Component {
             path="/signup"
             render={() => <Signup doSetCurrentUser={this.doSetCurrentUser} />}
           />
+          <Route exact path="/createmodule" component={CreateModule} />
+          <Route exact path="/createclass" component={CreateClass} />
+          <Route exact path="/createrace" component={CreateRace} />
+          <Route exact path="/modules" component={Modules} />
         </Switch>
       </div>
     );
