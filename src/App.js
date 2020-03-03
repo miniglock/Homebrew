@@ -10,6 +10,7 @@ import CreateRace from "./components/Create/race.jsx";
 import CreateClass from "./components/Create/class.jsx";
 import Modules from "./components/Modules";
 import Firebase from "./components/Firebase/firebase.js";
+import ModuleShow from "./components/Modules/show";
 
 class App extends Component {
   state = {
@@ -68,6 +69,7 @@ class App extends Component {
           <Route exact path="/createclass" component={CreateClass} />
           <Route exact path="/createrace" component={CreateRace} />
           <Route exact path="/modules" component={Modules} />
+          <Route exact path="/modules/:moduleId" component={ModuleShow} />
         </Switch>
       </div>
     );

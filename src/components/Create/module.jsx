@@ -43,7 +43,7 @@ const CreateModule = props => {
   };
 
   if (submitted) {
-    return <Redirect to="/" />;
+    return <Redirect to="/modules" />;
   }
 
   return (
