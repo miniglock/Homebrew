@@ -26,7 +26,7 @@ class Firebase {
 
   doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
 
-  doSignOut = () => this.auth.signOut;
+  doSignOut = () => this.auth.signOut();
 }
 
 const firebase = new Firebase();

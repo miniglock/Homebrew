@@ -5,6 +5,11 @@ import { MyWrapper } from "../Login/style.js";
 import firebase from "../Firebase/firebase.js";
 
 const CreateClass = props => {
+  const {
+    match: {
+      params: { classId }
+    }
+  } = props;
   const [name, setName] = useState("");
   const [hitDice, setHitDice] = useState("");
   const [equipmentProficiencies, setEquipmentProficiencies] = useState("");
@@ -16,17 +21,29 @@ const CreateClass = props => {
   const [exists, setExists] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async e => {
-    try {
-      const classRef = await firebase.database
-        .collection("classes")
-        .where("name", "==", `${name}`);
-      const docSnapshot = await classRef.get();
-      console.log("classRef: ", docSnapshot);
-      console.log("current user: ", props.currentUser);
+  const onLoad = async () => {
+    const classRef = await firebase.database
+      .collection("classes")
+      .doc(classId)
+      .get();
+    const docSnapshot = classRef.data();
+    setName(docSnapshot.name);
+    setBriefDescription(docSnapshot.briefDescription);
+    setHitDice(docSnapshot.hitDice);
+    setEquipmentProficiencies(docSnapshot.equipmentProficiencies);
+    setSavingThrowProficiencies(docSnapshot.savingThrowProficiencies);
+    setSkillProficiencies(docSnapshot.skillProficiencies);
+    setStartingEquipment(docSnapshot.startingEquipment);
+    setClassFeatures(docSnapshot.classFeatures);
 
-      if (docSnapshot.empty) {
-        firebase.database.collection("classes").add({
+    console.log("classRef: ", docSnapshot);
+  };
+  const handleSubmit = async () => {
+    try {
+      await firebase.database
+        .collection("classes")
+        .doc(classId)
+        .update({
           name: name,
           hitDice: hitDice,
           equipmentProficiencies: equipmentProficiencies,
@@ -34,15 +51,11 @@ const CreateClass = props => {
           skillProficiencies: skillProficiencies,
           startingEquipment: startingEquipment,
           classFeatures: classFeatures,
-          briefDescription: briefDescription,
-          createdBy: props.currentUser
+          briefDescription: briefDescription
         });
-        setSubmitted(true);
+      setSubmitted(true);
 
-        console.log("added class");
-      } else if (!docSnapshot.empty) {
-        setExists(true);
-      }
+      console.log("added class");
     } catch (error) {
       console.log(error);
     }
@@ -53,30 +66,28 @@ const CreateClass = props => {
     handleSubmit();
   };
 
+  useEffect(() => {
+    onLoad();
+  }, []);
+
   if (submitted) {
     return <Redirect to="/classes" />;
   }
-  console.log("oneClass: ", props.location);
+  console.log("oneClass: ", props);
   return (
     <>
       {submitted ? (
-        <Redirect to="/" />
+        <Redirect to="/classes" />
       ) : (
         <MyWrapper>
-          {exists && (
-            <h2 style={{ color: "red" }}>
-              A class with that name already exists in the database. Please
-              rename your class and try again.
-            </h2>
-          )}
           <Form onSubmit={handleForm}>
             <FormGroup>
               <Label for="name">Name of Your Class</Label>
               <Input
                 type="text"
                 name="name"
-                placeholder="Barbarian"
                 onChange={e => setName(e.target.value)}
+                value={name}
               />
             </FormGroup>
             <FormGroup>
@@ -87,6 +98,7 @@ const CreateClass = props => {
                 type="textarea"
                 name="briefDescription"
                 onChange={e => setBriefDescription(e.target.value)}
+                value={briefDescription}
               />
             </FormGroup>
             <FormGroup>
@@ -95,6 +107,7 @@ const CreateClass = props => {
                 type="text"
                 name="hitDice"
                 onChange={e => setHitDice(e.target.value)}
+                value={hitDice}
               />
             </FormGroup>
             <FormGroup>
@@ -105,6 +118,7 @@ const CreateClass = props => {
                 type="text"
                 name="equipmentProficiencies"
                 onChange={e => setEquipmentProficiencies(e.target.value)}
+                value={equipmentProficiencies}
               />
             </FormGroup>
             <FormGroup>
@@ -115,6 +129,7 @@ const CreateClass = props => {
                 type="text"
                 name="savingThrowProficiencies"
                 onChange={e => setSavingThrowProficiencies(e.target.value)}
+                value={savingThrowProficiencies}
               />
             </FormGroup>
             <FormGroup>
@@ -123,6 +138,7 @@ const CreateClass = props => {
                 type="text"
                 name="skillProficiencies"
                 onChange={e => setSkillProficiencies(e.target.value)}
+                value={skillProficiencies}
               />
             </FormGroup>
             <FormGroup>
@@ -131,6 +147,7 @@ const CreateClass = props => {
                 type="text"
                 name="startingEquipment"
                 onChange={e => setStartingEquipment(e.target.value)}
+                value={startingEquipment}
               />
             </FormGroup>
             <FormGroup>
@@ -142,6 +159,7 @@ const CreateClass = props => {
                 type="textarea"
                 name="classFeatures"
                 onChange={e => setClassFeatures(e.target.value)}
+                value={classFeatures}
               />
             </FormGroup>
             <Button>Submit</Button>

@@ -25,7 +25,8 @@ const CreateModule = props => {
           name: name,
           briefDescription: briefDescription,
           numberOfPlayers: numberOfPlayers,
-          fullModule: fullModule
+          fullModule: fullModule,
+          createdBy: props.currentUser
         });
         setSubmitted(true);
 

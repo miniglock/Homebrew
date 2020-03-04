@@ -19,7 +19,7 @@ const ModuleShow = props => {
 
   useEffect(() => {
     getModule(id);
-  }, []);
+  }, [id]);
 
   return (
     <div

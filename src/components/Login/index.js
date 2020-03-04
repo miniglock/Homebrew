@@ -17,10 +17,14 @@ class Login extends Component {
   };
 
   handleFormSubmit = async e => {
-    const { email, password } = this.state;
     e.preventDefault();
+    const { email, password } = this.state;
     try {
-      await Firebase.doSignInUserWithEmailAndPassword(email, password);
+      const userAuth = await Firebase.doSignInUserWithEmailAndPassword(
+        email,
+        password
+      );
+      console.log("userAuth: ", userAuth.user.uid);
       this.props.doSetCurrentUser({ email });
       this.setState({ isAuth: true });
       console.log("hit");
@@ -28,9 +32,7 @@ class Login extends Component {
       this.setState({
         error
       });
-      setTimeout(() => {
-        this.setState({ error: null });
-      }, 3000);
+      this.setState({ error: null });
     }
   };
   render() {
@@ -43,7 +45,7 @@ class Login extends Component {
     return (
       <MyWrapper color="pink">
         <h1> Login</h1>
-        <MyForm onSubmit={this.handleMySubmit}>
+        <MyForm onSubmit={this.handleFormSubmit}>
           <input
             placeholder="Email"
             type="text"

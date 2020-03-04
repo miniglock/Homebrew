@@ -7,10 +7,7 @@ import {
   DropdownItem,
   DropdownToggle,
   DropdownMenu,
-  Collapse,
   Navbar,
-  NavbarToggler,
-  NavbarBrand,
   Nav,
   NavItem
 } from "reactstrap";
@@ -34,12 +31,9 @@ const NavigationBar = ({ isLoggedIn, currentUser, doSetCurrentUser }) => {
       <Navbar>
         <Nav tabs>
           <NavItem>
-            <NavLink className="nav-link" exact to="/" active>
+            <NavLink className="nav-link" exact to="/">
               HomeBrew Inc.
             </NavLink>
-            <span style={{ cursor: "pointer" }} onClick={logoutUser}>
-              LOGOUT
-            </span>
           </NavItem>
           <NavItem>
             <NavLink className="nav-link" exact to="/modules">
@@ -88,14 +82,26 @@ const NavigationBar = ({ isLoggedIn, currentUser, doSetCurrentUser }) => {
             </Dropdown>
           )}
         </Nav>
-        <Nav right>
-          <NavLink className="nav-link" exact to="/login">
-            Login
-          </NavLink>
-          <NavLink className="nav-link" exact to="/signup">
-            Signup
-          </NavLink>
-        </Nav>
+        {isLoggedIn ? (
+          <Nav>
+            <span
+              className="nav-link"
+              style={{ cursor: "pointer" }}
+              onClick={logoutUser}
+            >
+              Logout
+            </span>
+          </Nav>
+        ) : (
+          <Nav>
+            <NavLink className="nav-link" exact to="/login">
+              Login
+            </NavLink>
+            <NavLink className="nav-link" exact to="/signup">
+              Signup
+            </NavLink>
+          </Nav>
+        )}
       </Navbar>
     </div>
   );
