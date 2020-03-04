@@ -1,93 +1,142 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import { MyWrapper } from "../Login/style.js";
+import firebase from "../Firebase/firebase.js";
 
-const Example = props => {
+const CreateClass = props => {
+  const [name, setName] = useState("");
+  const [hitDice, setHitDice] = useState("");
+  const [equipmentProficiencies, setEquipmentProficiencies] = useState("");
+  const [savingThrowProficiencies, setSavingThrowProficiencies] = useState("");
+  const [skillProficiencies, setSkillProficiencies] = useState("");
+  const [startingEquipment, setStartingEquipment] = useState("");
+  const [classFeatures, setClassFeatures] = useState("");
+  const [createdBy, setCreatedBy] = useState("");
+  const [exists, setExists] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async e => {
+    try {
+      const classRef = await firebase.database
+        .collection("classes")
+        .where("name", "==", `${name}`);
+      const docSnapshot = await classRef.get();
+      console.log("classRef: ", docSnapshot);
+
+      if (docSnapshot.empty) {
+        firebase.database.collection("classes").add({
+          name: name,
+          hitDice: hitDice,
+          equipmentProficiencies: equipmentProficiencies,
+          savingThrowProficiencies: savingThrowProficiencies,
+          skillProficiencies: skillProficiencies,
+          startingEquipment: startingEquipment,
+          classFeatures: classFeatures
+        });
+        setSubmitted(true);
+
+        console.log("added class");
+      } else if (!docSnapshot.empty) {
+        setExists(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleForm = async e => {
+    e.preventDefault();
+    handleSubmit();
+  };
+
+  if (submitted) {
+    return <Redirect to="/classes" />;
+  }
+  console.log(props.currentUser);
   return (
-    <Form>
-      <FormGroup>
-        <Label for="exampleEmail">Email</Label>
-        <Input
-          type="email"
-          name="email"
-          id="exampleEmail"
-          placeholder="with a placeholder"
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label for="examplePassword">Password</Label>
-        <Input
-          type="password"
-          name="password"
-          id="examplePassword"
-          placeholder="password placeholder"
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label for="exampleSelect">Select</Label>
-        <Input type="select" name="select" id="exampleSelect">
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
-        </Input>
-      </FormGroup>
-      <FormGroup>
-        <Label for="exampleSelectMulti">Select Multiple</Label>
-        <Input
-          type="select"
-          name="selectMulti"
-          id="exampleSelectMulti"
-          multiple
-        >
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
-        </Input>
-      </FormGroup>
-      <FormGroup>
-        <Label for="exampleText">Text Area</Label>
-        <Input type="textarea" name="text" id="exampleText" />
-      </FormGroup>
-      <FormGroup>
-        <Label for="exampleFile">File</Label>
-        <Input type="file" name="file" id="exampleFile" />
-        <FormText color="muted">
-          This is some placeholder block-level help text for the above input.
-          It's a bit lighter and easily wraps to a new line.
-        </FormText>
-      </FormGroup>
-      <FormGroup tag="fieldset">
-        <legend>Radio Buttons</legend>
-        <FormGroup check>
-          <Label check>
-            <Input type="radio" name="radio1" /> Option one is this and that—be
-            sure to include why it's great
-          </Label>
-        </FormGroup>
-        <FormGroup check>
-          <Label check>
-            <Input type="radio" name="radio1" /> Option two can be something
-            else and selecting it will deselect option one
-          </Label>
-        </FormGroup>
-        <FormGroup check disabled>
-          <Label check>
-            <Input type="radio" name="radio1" disabled /> Option three is
-            disabled
-          </Label>
-        </FormGroup>
-      </FormGroup>
-      <FormGroup check>
-        <Label check>
-          <Input type="checkbox" /> Check me out
-        </Label>
-      </FormGroup>
-      <Button>Submit</Button>
-    </Form>
+    <>
+      {submitted ? (
+        <Redirect to="/" />
+      ) : (
+        <MyWrapper>
+          {exists && (
+            <h2 style={{ color: "red" }}>
+              A class with that name already exists in the database. Please
+              rename your class and try again.
+            </h2>
+          )}
+          <Form onSubmit={handleForm}>
+            <FormGroup>
+              <Label for="name">Name of Your Class</Label>
+              <Input
+                type="text"
+                name="name"
+                placeholder="Barbarian"
+                onChange={e => setName(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="hitDice">Hit Dice</Label>
+              <Input
+                type="text"
+                name="hitDice"
+                onChange={e => setHitDice(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="equipmentProficiencies">
+                Equipment Proficiencies
+              </Label>
+              <Input
+                type="text"
+                name="equipmentProficiencies"
+                onChange={e => setEquipmentProficiencies(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="savingThrowProficiencies">
+                Saving Throw Proficiencies
+              </Label>
+              <Input
+                type="text"
+                name="savingThrowProficiencies"
+                onChange={e => setSavingThrowProficiencies(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="skillProficiencies">Skill Proficiencies</Label>
+              <Input
+                type="text"
+                name="skillProficiencies"
+                onChange={e => setSkillProficiencies(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="startingEquipment">Starting Equipment</Label>
+              <Input
+                type="text"
+                name="startingEquipment"
+                onChange={e => setStartingEquipment(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="classFeatures">Class Features by Level</Label>
+              <FormText color="muted">
+                Please copy and paste from the source document in plain text.
+              </FormText>
+              <Input
+                type="textarea"
+                name="classFeatures"
+                onChange={e => setClassFeatures(e.target.value)}
+              />
+            </FormGroup>
+            <Button>Submit</Button>
+          </Form>
+        </MyWrapper>
+      )}
+    </>
   );
 };
 
-export default Example;
+export default CreateClass;

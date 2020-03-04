@@ -18,12 +18,13 @@ class App extends Component {
     isLoggedIn: false
   };
 
-  doSetCurrentUser = currentUser => {
-    this.setState({
-      currentUser,
-      isLoggedIn: currentUser ? true : false
-    });
-  };
+  // doSetCurrentUser = currentUser => {
+  //   this.setState({
+  //     currentUser,
+  //     isLoggedIn: currentUser ? true : false
+  //   });
+  //   console.log("line26: ", this.currentUser);
+  // };
 
   componentDidMount = async () => {
     await Firebase.auth.onAuthStateChanged(async authUser => {
@@ -32,8 +33,10 @@ class App extends Component {
         const user = await Firebase.database
           .collection("users")
           .get(authUser.id);
+        // console.log("cur use: ", user.docs[0].data());
+        const oneDoc = user.docs[0].data();
         this.setState({
-          currentUser: user.docs[0].data(),
+          currentUser: oneDoc,
           isLoggedIn: true
         });
       } else {
@@ -44,6 +47,7 @@ class App extends Component {
 
   render() {
     const { isLoggedIn, currentUser } = this.state;
+    console.log(this.state.currentUser);
     return (
       <div>
         <Navbar
@@ -66,7 +70,11 @@ class App extends Component {
             render={() => <Signup doSetCurrentUser={this.doSetCurrentUser} />}
           />
           <Route exact path="/createmodule" component={CreateModule} />
-          <Route exact path="/createclass" component={CreateClass} />
+          <Route
+            exact
+            path="/createclass"
+            render={() => <CreateClass currentUser={this.currentUser} />}
+          />
           <Route exact path="/createrace" component={CreateRace} />
           <Route exact path="/modules" component={Modules} />
           <Route exact path="/modules/:moduleId" component={ModuleShow} />
