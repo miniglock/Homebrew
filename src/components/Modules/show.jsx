@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { withRouter, NavLink } from "react-router-dom";
 import firebase from "../Firebase/firebase.js";
 
 const ModuleShow = props => {
@@ -7,6 +8,8 @@ const ModuleShow = props => {
       params: { moduleId }
     }
   } = props;
+
+  const { currentUser } = props;
 
   const [oneModule, setModule] = useState({});
   const [id, setId] = useState(moduleId);
@@ -43,8 +46,15 @@ const ModuleShow = props => {
       <div className="card">
         <h5 className="card-body">{oneModule.fullModule}</h5>
       </div>
+      {currentUser &&
+        oneModule.createdBy &&
+        currentUser.uid === oneModule.createdBy.uid && (
+          <NavLink exact to={`/modules/${moduleId}/update`}>
+            Update
+          </NavLink>
+        )}
     </div>
   );
 };
 
-export default ModuleShow;
+export default withRouter(ModuleShow);

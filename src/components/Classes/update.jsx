@@ -18,7 +18,6 @@ const CreateClass = props => {
   const [startingEquipment, setStartingEquipment] = useState("");
   const [classFeatures, setClassFeatures] = useState("");
   const [briefDescription, setBriefDescription] = useState("");
-  const [exists, setExists] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const onLoad = async () => {

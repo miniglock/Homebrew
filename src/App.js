@@ -9,6 +9,7 @@ import CreateRace from "./components/Create/race.jsx";
 import Modules from "./components/Modules";
 import ModuleShow from "./components/Modules/show";
 import CreateModule from "./components/Create/module.jsx";
+import ModuleUpdate from "./components/Modules/update.jsx";
 import Classes from "./components/Classes";
 import ClassShow from "./components/Classes/show.jsx";
 import CreateClass from "./components/Create/class.jsx";
@@ -71,12 +72,20 @@ class App extends Component {
             render={() => <Signup doSetCurrentUser={this.doSetCurrentUser} />}
           />
           <Route exact path="/modules" component={Modules} />
-          <Route exact path="/modules/:moduleId" component={ModuleShow} />
-
+          <Route
+            exact
+            path="/modules/:moduleId"
+            render={() => <ModuleShow currentUser={this.state.currentUser} />}
+          />
           <Route
             exact
             path="/createmodule"
             render={() => <CreateModule currentUser={currentUser} />}
+          />
+          <Route
+            exact
+            path="/modules/:moduleId/update"
+            component={ModuleUpdate}
           />
           <Route exact path="/classes" component={Classes} />
           <Route
