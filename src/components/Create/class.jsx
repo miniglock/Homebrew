@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { MyWrapper } from "../Login/style.js";
@@ -22,8 +22,6 @@ const CreateClass = props => {
         .collection("classes")
         .where("name", "==", `${name}`);
       const docSnapshot = await classRef.get();
-      console.log("classRef: ", docSnapshot);
-      console.log("current user: ", props.currentUser);
 
       if (docSnapshot.empty) {
         firebase.database.collection("classes").add({
@@ -38,8 +36,6 @@ const CreateClass = props => {
           createdBy: props.currentUser
         });
         setSubmitted(true);
-
-        console.log("added class");
       } else if (!docSnapshot.empty) {
         setExists(true);
       }
@@ -56,7 +52,7 @@ const CreateClass = props => {
   if (submitted) {
     return <Redirect to="/classes" />;
   }
-  console.log("oneClass: ", props.location);
+
   return (
     <>
       {submitted ? (

@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { MyWrapper } from "../Login/style.js";
 import firebase from "../Firebase/firebase.js";
 
-const CreateRace = props => {
+const RaceUpdate = props => {
+  const {
+    match: {
+      params: { raceId }
+    }
+  } = props;
+  const [oldName, setOldName] = useState("");
   const [name, setName] = useState("");
   const [abilityScores, setAbilityScores] = useState("");
   const [size, setSize] = useState("");
@@ -20,32 +26,75 @@ const CreateRace = props => {
   const [exists, setExists] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async e => {
+  const onLoad = async () => {
+    const raceRef = await firebase.database
+      .collection("races")
+      .doc(raceId)
+      .get();
+    const docSnapshot = raceRef.data();
+    setOldName(docSnapshot.name);
+    setName(docSnapshot.name);
+    setSize(docSnapshot.size);
+    setRunSpeed(docSnapshot.runSpeed);
+    setFlySpeed(docSnapshot.flySpeed);
+    setSwimSpeed(docSnapshot.swimSpeed);
+    setAlignment(docSnapshot.alignment);
+    setLanguages(docSnapshot.languages);
+    setEquipmentProficiencies(docSnapshot.equipmentProficiencies);
+    setSavingThrowProficiencies(docSnapshot.savingThrowProficiencies);
+    setSkillProficiencies(docSnapshot.skillProficiencies);
+    setRaceTraits(docSnapshot.raceTraits);
+    setAbilityScores(docSnapshot.abilityScores);
+  };
+  const handleSubmit = async () => {
     try {
-      const raceRef = await firebase.database
-        .collection("races")
-        .where("name", "==", `${name}`);
-      const docSnapshot = await raceRef.get();
+      if (oldName !== name) {
+        const raceRef = await firebase.database
+          .collection("races")
+          .where(raceId, "!=", "hello")
+          .where("name", "==", `${name}`);
+        const docSnapshot = await raceRef.get();
 
-      if (docSnapshot.empty) {
-        firebase.database.collection("races").add({
-          name: name,
-          abilityScores: abilityScores,
-          equipmentProficiencies: equipmentProficiencies,
-          savingThrowProficiencies: savingThrowProficiencies,
-          skillProficiencies: skillProficiencies,
-          runSpeed: runSpeed,
-          flySpeed: flySpeed,
-          swimSpeed: swimSpeed,
-          alignment: alignment,
-          languages: languages,
-          raceTraits: raceTraits,
-          size: size,
-          createdBy: props.currentUser
-        });
+        if (docSnapshot.empty) {
+          await firebase.database
+            .collection("races")
+            .doc(raceId)
+            .update({
+              name: name,
+              abilityScores: abilityScores,
+              equipmentProficiencies: equipmentProficiencies,
+              savingThrowProficiencies: savingThrowProficiencies,
+              skillProficiencies: skillProficiencies,
+              runSpeed: runSpeed,
+              flySpeed: flySpeed,
+              swimSpeed: swimSpeed,
+              alignment: alignment,
+              languages: languages,
+              raceTraits: raceTraits,
+              size: size
+            });
+          setSubmitted(true);
+        } else if (!docSnapshot.empty) {
+          setExists(true);
+        }
+      } else if (oldName === name) {
+        await firebase.database
+          .collection("races")
+          .doc(raceId)
+          .update({
+            abilityScores: abilityScores,
+            equipmentProficiencies: equipmentProficiencies,
+            savingThrowProficiencies: savingThrowProficiencies,
+            skillProficiencies: skillProficiencies,
+            runSpeed: runSpeed,
+            flySpeed: flySpeed,
+            swimSpeed: swimSpeed,
+            alignment: alignment,
+            languages: languages,
+            raceTraits: raceTraits,
+            size: size
+          });
         setSubmitted(true);
-      } else if (!docSnapshot.empty) {
-        setExists(true);
       }
     } catch (error) {
       console.log(error);
@@ -57,10 +106,14 @@ const CreateRace = props => {
     handleSubmit();
   };
 
+  useEffect(() => {
+    onLoad();
+    // eslint-disable-next-line
+  }, []);
+
   if (submitted) {
     return <Redirect to="/races" />;
   }
-
   return (
     <>
       {submitted ? (
@@ -79,7 +132,7 @@ const CreateRace = props => {
               <Input
                 type="text"
                 name="name"
-                placeholder="Dwarf"
+                value={name}
                 onChange={e => setName(e.target.value)}
               />
             </FormGroup>
@@ -88,6 +141,7 @@ const CreateRace = props => {
               <Input
                 type="textarea"
                 name="abilityScores"
+                value={abilityScores}
                 onChange={e => setAbilityScores(e.target.value)}
               />
             </FormGroup>
@@ -96,6 +150,7 @@ const CreateRace = props => {
               <Input
                 type="text"
                 name="size"
+                value={size}
                 onChange={e => setSize(e.target.value)}
               />
             </FormGroup>
@@ -105,18 +160,21 @@ const CreateRace = props => {
                 type="text"
                 name="speed"
                 placeholder="Run Speed"
+                value={runSpeed}
                 onChange={e => setRunSpeed(e.target.value)}
               />
               <Input
                 type="text"
                 name="speed"
                 placeholder="Swim Speed"
+                value={swimSpeed}
                 onChange={e => setSwimSpeed(e.target.value)}
               />
               <Input
                 type="text"
                 name="speed"
                 placeholder="Fly Speed"
+                value={flySpeed}
                 onChange={e => setFlySpeed(e.target.value)}
               />
             </FormGroup>
@@ -125,6 +183,7 @@ const CreateRace = props => {
               <Input
                 type="text"
                 name="alignment"
+                value={alignment}
                 onChange={e => setAlignment(e.target.value)}
               />
             </FormGroup>
@@ -133,6 +192,7 @@ const CreateRace = props => {
               <Input
                 type="text"
                 name="languages"
+                value={languages}
                 onChange={e => setLanguages(e.target.value)}
               />
             </FormGroup>
@@ -143,6 +203,7 @@ const CreateRace = props => {
               <Input
                 type="text"
                 name="equipmentProficiencies"
+                value={equipmentProficiencies}
                 onChange={e => setEquipmentProficiencies(e.target.value)}
               />
             </FormGroup>
@@ -153,6 +214,7 @@ const CreateRace = props => {
               <Input
                 type="text"
                 name="savingThrowProficiencies"
+                value={savingThrowProficiencies}
                 onChange={e => setSavingThrowProficiencies(e.target.value)}
               />
             </FormGroup>
@@ -161,6 +223,7 @@ const CreateRace = props => {
               <Input
                 type="text"
                 name="skillProficiencies"
+                value={skillProficiencies}
                 onChange={e => setSkillProficiencies(e.target.value)}
               />
             </FormGroup>
@@ -172,6 +235,7 @@ const CreateRace = props => {
               <Input
                 type="textarea"
                 name="raceTraits"
+                value={raceTraits}
                 onChange={e => setRaceTraits(e.target.value)}
               />
             </FormGroup>
@@ -183,4 +247,4 @@ const CreateRace = props => {
   );
 };
 
-export default CreateRace;
+export default RaceUpdate;

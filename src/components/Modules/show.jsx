@@ -12,6 +12,7 @@ const ModuleShow = props => {
   const { currentUser } = props;
 
   const [oneModule, setModule] = useState({});
+  // eslint-disable-next-line
   const [id, setId] = useState(moduleId);
 
   const getModule = async id => {

@@ -7,7 +7,6 @@ const Profile = () => {
       .collection("races")
       .where("name", "==", "gnome");
     const docSnapshot = await raceRef.get();
-    console.log(docSnapshot);
 
     if (docSnapshot.empty) {
       Firebase.database.collection("races").add({ name: "gnome" });
@@ -17,9 +16,7 @@ const Profile = () => {
   const fetchRaces = async () => {
     const racesRef = await Firebase.database.collection("races");
     const querySnapshot = await racesRef.get();
-    querySnapshot.forEach(doc => {
-      console.log(doc.data());
-    });
+    querySnapshot.forEach(doc => {});
   };
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { MyWrapper } from "../Login/style.js";
@@ -18,7 +18,6 @@ const CreateModule = props => {
         .collection("modules")
         .where("name", "==", `${name}`);
       const docSnapshot = await raceRef.get();
-      console.log("raceRef: ", docSnapshot);
 
       if (docSnapshot.empty) {
         firebase.database.collection("modules").add({
@@ -29,8 +28,6 @@ const CreateModule = props => {
           createdBy: props.currentUser
         });
         setSubmitted(true);
-
-        console.log("added module");
       } else if (!docSnapshot.empty) {
         setExists(true);
       }
@@ -102,13 +99,6 @@ const CreateModule = props => {
                 name="fullDescription"
                 onChange={e => setFullModule(e.target.value)}
               />
-            </FormGroup>
-            <FormGroup>
-              <Label for="exampleFile">Associated Files</Label>
-              <Input type="file" name="file" id="exampleFile" />
-              <FormText color="muted">
-                Please upload any associate files such as maps etc.
-              </FormText>
             </FormGroup>
             <Button>Submit</Button>
           </Form>

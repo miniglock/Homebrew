@@ -24,10 +24,9 @@ class Login extends Component {
         email,
         password
       );
-      console.log("userAuth: ", userAuth.user.uid);
+
       this.props.doSetCurrentUser({ email });
       this.setState({ isAuth: true });
-      console.log("hit");
     } catch (error) {
       this.setState({
         error

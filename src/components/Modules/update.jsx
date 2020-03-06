@@ -4,13 +4,14 @@ import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 import { MyWrapper } from "../Login/style.js";
 import firebase from "../Firebase/firebase.js";
 
-const UpdateModule = props => {
+const ModuleUpdate = props => {
   const {
     match: {
       params: { moduleId }
     }
   } = props;
   const [name, setName] = useState("");
+  const [oldName, setOldName] = useState("");
   const [briefDescription, setBriefDescription] = useState("");
   const [numberOfPlayers, setnumberOfPlayers] = useState("3 or less");
   const [fullModule, setFullModule] = useState("");
@@ -23,6 +24,7 @@ const UpdateModule = props => {
       .doc(moduleId)
       .get();
     const docSnapshot = moduleRef.data();
+    setOldName(docSnapshot.name);
     setName(docSnapshot.name);
     setBriefDescription(docSnapshot.briefDescription);
     setnumberOfPlayers(docSnapshot.numberOfPlayers);
@@ -31,24 +33,38 @@ const UpdateModule = props => {
 
   const addModule = async e => {
     try {
-      const moduleRef = await firebase.database
-        .collection("modules")
-        .where("name", "==", `${name}`);
-      const docSnapshot = await moduleRef.get();
-      console.log(docSnapshot);
+      if (oldName !== name) {
+        const moduleRef = await firebase.database
+          .collection("modules")
+          .where(moduleId, "!=", "hello")
+          .where("name", "==", `${name}`);
+        const docSnapshot = await moduleRef.get();
 
-      //   firebase.database
-      //     .collection("modules")
-      //     .doc(moduleId)
-      //     .update({
-      //       name: name,
-      //       briefDescription: briefDescription,
-      //       numberOfPlayers: numberOfPlayers,
-      //       fullModule: fullModule
-      //     });
-      //   setSubmitted(true);
-
-      console.log("added module");
+        if (docSnapshot.empty) {
+          await firebase.database
+            .collection("modules")
+            .doc(moduleId)
+            .update({
+              name: name,
+              briefDescription: briefDescription,
+              numberOfPlayers: numberOfPlayers,
+              fullModule: fullModule
+            });
+          setSubmitted(true);
+        } else if (!docSnapshot.empty) {
+          setExists(true);
+        }
+      } else if (oldName === name) {
+        await firebase.database
+          .collection("modules")
+          .doc(moduleId)
+          .update({
+            briefDescription: briefDescription,
+            numberOfPlayers: numberOfPlayers,
+            fullModule: fullModule
+          });
+        setSubmitted(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -59,6 +75,7 @@ const UpdateModule = props => {
   };
   useEffect(() => {
     onLoad();
+    // eslint-disable-next-line
   }, []);
 
   if (submitted) {
@@ -71,6 +88,12 @@ const UpdateModule = props => {
         <Redirect to="/" />
       ) : (
         <MyWrapper>
+          {exists && (
+            <h2 style={{ color: "red" }}>
+              A class with that name already exists in the database. Please
+              rename your class and try again.
+            </h2>
+          )}
           <Form onSubmit={handleForm}>
             <FormGroup>
               <Label for="name">Name of Your Module</Label>
@@ -118,13 +141,6 @@ const UpdateModule = props => {
                 onChange={e => setFullModule(e.target.value)}
               />
             </FormGroup>
-            <FormGroup>
-              <Label for="exampleFile">Associated Files</Label>
-              <Input type="file" name="file" id="exampleFile" />
-              <FormText color="muted">
-                Please upload any associate files such as maps etc.
-              </FormText>
-            </FormGroup>
             <Button>Submit</Button>
           </Form>
         </MyWrapper>
@@ -133,4 +149,4 @@ const UpdateModule = props => {
   );
 };
 
-export default UpdateModule;
+export default ModuleUpdate;

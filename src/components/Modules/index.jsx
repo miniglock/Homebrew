@@ -16,9 +16,6 @@ const Modules = () => {
 
     setData([...moduleRef.docs.map(doc => ({ ...doc.data(), id: doc.id }))]);
   };
-  // if (existingModules[0]) {
-  //   console.log(existingModules[0].id);
-  // }
   useEffect(() => {
     getModules();
   }, []);

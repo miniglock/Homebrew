@@ -20,6 +20,7 @@ const ClassShow = props => {
 
   useEffect(() => {
     getClass(classId);
+    // eslint-disable-next-line
   }, []);
 
   return (

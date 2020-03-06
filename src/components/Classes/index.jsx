@@ -19,7 +19,7 @@ const Classes = props => {
 
   useEffect(() => {
     getClasses();
-    console.log(props.currentUser);
+    // eslint-disable-next-line
   }, []);
   return (
     <ListGroup
