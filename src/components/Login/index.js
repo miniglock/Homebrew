@@ -20,6 +20,7 @@ class Login extends Component {
     e.preventDefault();
     const { email, password } = this.state;
     try {
+      // eslint-disable-next-line
       const userAuth = await Firebase.doSignInUserWithEmailAndPassword(
         email,
         password
