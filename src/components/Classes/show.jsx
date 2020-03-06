@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { withRouter, NavLink } from "react-router-dom";
+import { withRouter, NavLink, Redirect } from "react-router-dom";
 import firebase from "../Firebase/firebase.js";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 const ClassShow = props => {
   const {
@@ -10,6 +11,11 @@ const ClassShow = props => {
   } = props;
   const { currentUser } = props;
 
+  const [submitted, setSubmitted] = useState(false);
+  const [modal, setModal] = useState(false);
+
+  const toggle = () => setModal(!modal);
+
   const [oneClass, setClass] = useState({});
 
   const getClass = async id => {
@@ -17,12 +23,23 @@ const ClassShow = props => {
     const docSnapshot = await classRef.get();
     setClass(docSnapshot.data());
   };
-
+  const classDelete = () => {
+    firebase.database
+      .collection("classes")
+      .doc(classId)
+      .delete()
+      .then(() => {
+        setSubmitted(true);
+      });
+    console.log("deleted");
+  };
   useEffect(() => {
     getClass(classId);
     // eslint-disable-next-line
   }, []);
-
+  if (submitted) {
+    return <Redirect to="/classes" />;
+  }
   return (
     <div
       style={{
@@ -64,9 +81,34 @@ const ClassShow = props => {
       {currentUser &&
         oneClass.createdBy &&
         currentUser.uid === oneClass.createdBy.uid && (
-          <NavLink exact to={`/classes/${classId}/update`}>
-            Update
-          </NavLink>
+          <div style={{ display: "flex", marginTop: "3px" }}>
+            <div style={{ marginRight: "3px" }}>
+              <NavLink
+                className="btn btn-danger"
+                exact
+                to={`/class/${classId}/update`}
+              >
+                Update
+              </NavLink>
+            </div>
+            <div>
+              <Button color="danger" onClick={toggle}>
+                Delete
+              </Button>
+              <Modal isOpen={modal} toggle={toggle}>
+                <ModalHeader toggle={toggle}>Confirm Delete</ModalHeader>
+                <ModalBody>Please confirm deletion</ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onClick={classDelete}>
+                    Delete
+                  </Button>{" "}
+                  <Button color="secondary" onClick={toggle}>
+                    Cancel
+                  </Button>
+                </ModalFooter>
+              </Modal>
+            </div>
+          </div>
         )}
     </div>
   );

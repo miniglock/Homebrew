@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { withRouter, NavLink } from "react-router-dom";
+import { withRouter, NavLink, Redirect } from "react-router-dom";
 import firebase from "../Firebase/firebase.js";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 const RaceShow = props => {
   const {
@@ -8,6 +9,11 @@ const RaceShow = props => {
       params: { raceId }
     }
   } = props;
+
+  const [submitted, setSubmitted] = useState(false);
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
+
   const { currentUser } = props;
 
   const [oneRace, setRace] = useState({});
@@ -18,11 +24,24 @@ const RaceShow = props => {
     setRace(docSnapshot.data());
   };
 
+  const raceDelete = () => {
+    firebase.database
+      .collection("races")
+      .doc(raceId)
+      .delete()
+      .then(() => {
+        setSubmitted(true);
+      });
+    console.log("deleted");
+  };
+
   useEffect(() => {
     getRace(raceId);
     // eslint-disable-next-line
   }, []);
-
+  if (submitted) {
+    return <Redirect to="/modules" />;
+  }
   return (
     <div
       style={{
@@ -75,9 +94,34 @@ const RaceShow = props => {
       {currentUser &&
         oneRace.createdBy &&
         currentUser.uid === oneRace.createdBy.uid && (
-          <NavLink exact to={`/races/${raceId}/update`}>
-            Update
-          </NavLink>
+          <div style={{ display: "flex", marginTop: "3px" }}>
+            <div style={{ marginRight: "3px" }}>
+              <NavLink
+                className="btn btn-danger"
+                exact
+                to={`/races/${raceId}/update`}
+              >
+                Update
+              </NavLink>
+            </div>
+            <div>
+              <Button color="danger" onClick={toggle}>
+                Delete
+              </Button>
+              <Modal isOpen={modal} toggle={toggle}>
+                <ModalHeader toggle={toggle}>Confirm Delete</ModalHeader>
+                <ModalBody>Please confirm deletion</ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onClick={raceDelete}>
+                    Delete
+                  </Button>{" "}
+                  <Button color="secondary" onClick={toggle}>
+                    Cancel
+                  </Button>
+                </ModalFooter>
+              </Modal>
+            </div>
+          </div>
         )}
     </div>
   );
